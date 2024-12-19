@@ -1,10 +1,10 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { CreateUserDto } from "../dtos/user.dto";
 import { CreateUser, GetUserDetails } from "../repository/userRepository";
 import { comparePassword } from "../utils/hashing/hash";
 import { generateJwt } from "../utils/hashing/jwt/jwt";
 
-export async function registerNewUser(req:Request<{},{},{userDetails:CreateUserDto}>,res:Response){
+export async function registerNewUser(req:Request<{},{},{userDetails:CreateUserDto}>,res:Response,next:NextFunction){
     try{
         const userDetails=req.body.userDetails
 
@@ -21,10 +21,13 @@ export async function registerNewUser(req:Request<{},{},{userDetails:CreateUserD
         console.log("New user created")
         res.status(200).json({"message":"Account created"})
     }catch(err){
-        console.error(err)
+        next()
     }
 }
-export async function authenticateUser(req:Request<{},{},{username:string,password:string}>,res:Response){
+export async function authenticateUser(req:Request<{},{},{username:string,password:string}>
+    ,res:Response,
+    next:NextFunction
+){
     try{
         const {username,password}=req.body
         if(!username || !password){
@@ -50,7 +53,6 @@ export async function authenticateUser(req:Request<{},{},{username:string,passwo
             sameSite:'lax'
         }).json(foundUser)
     }catch(err){
-        console.error(err)
-        
+        next()
     }
 }

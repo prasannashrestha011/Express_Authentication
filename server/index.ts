@@ -1,13 +1,19 @@
 import  express from "express";
 import authRoute from './routes/authRoute'
 import dotenv from 'dotenv'
+import { errorHandlers } from "./middleware/errorHandlers";
+ dotenv.config()
 const app=express()
-app.use(express.json())
 const PORT=process.env.PORT
 
-dotenv.config()
+app.use(express.json())
+//middlewares
+app.use(errorHandlers) 
+
+//app routes
 app.use("/api/auth",authRoute)
-console.log(process.env.JWT_SECRET)
+
+
 app.listen(PORT,()=>{
     console.log(`Server running on PORT ${PORT}`)
 })
