@@ -8,7 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model userModel{
+model user_model{
   userId Int @id @default(autoincrement())
   email String @unique
   username String @unique
@@ -16,11 +16,11 @@ model userModel{
   fullname String 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  role role[] @relation("_user_role_junction")
+  roles role[] @relation("_user_role_junction")
 }
 
 model role{
   roleId Int @id @default(autoincrement())
   roleName String 
-  user userModel[] @relation("_user_role_junction")
+  user user_model[] @relation("_user_role_junction")
 }
