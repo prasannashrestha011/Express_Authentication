@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { CreateUserDto } from "../dtos/user.dto";
-import { CreateUser, GetUserDetails } from "../repository/userRepository";
-import { comparePassword } from "../utils/hashing/hash";
+import { CreateUser, GetUserDetails, UpdatePassword } from "../repository/userRepository";
+import { comparePassword, hashPassword } from "../utils/hashing/hash";
 import { generateJwt } from "../utils/hashing/jwt/jwt";
 
 export async function registerNewUser(req:Request<{},{},{userDetails:CreateUserDto}>,res:Response,next:NextFunction){
@@ -54,5 +54,36 @@ export async function authenticateUser(req:Request<{},{},{username:string,passwo
         }).json(foundUser)
     }catch(err){
         next()
+    }
+}
+export async function changePassword(req:Request<{},{},{username:string,password:string,newPassword:string}>,res:Response,next:NextFunction){
+    try{
+        const {username,password,newPassword}=req.body
+        if(!username || !password || !newPassword){
+            res.status(400).json({"err":"insufficent credentials"})
+            return 
+        }
+        const userDetails=await GetUserDetails(username)
+        if(!userDetails){
+            res.status(404).json({"err":"user not found"})
+            return 
+        }
+        const isAuthenticated=comparePassword(userDetails.password,password)
+        if(!isAuthenticated){
+            res.status(401);
+            return 
+        }
+        const hashedPassword=await hashPassword(newPassword)
+       const isPassUpdated= await UpdatePassword(username,hashedPassword)
+       if(!isPassUpdated){
+        res.status(403).json({err:"failed to update the password"})
+        return 
+        }
+        res.status(200).json({message:"Your password has been changed"})
+        
+    }catch(err){
+        console.log(err)
+        res.status(500).json({"err":"Unknow error occured"})
+        return 
     }
 }

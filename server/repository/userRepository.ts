@@ -3,7 +3,6 @@ import { CreateUserDto, UserDto } from "../dtos/user.dto";
 import { hashPassword } from "../utils/hashing/hash";
 
 const prisma=new PrismaClient()
-
 export async function CreateUser(userDetails:CreateUserDto):Promise<boolean>{
     try{
         const {email,username,password,fullname,roleIds}=userDetails
@@ -44,5 +43,19 @@ export async function GetUserDetails(username:string):Promise<UserDto | null>{
     }catch(err){
         console.error(err)
         return null
+    }
+}
+export async function UpdatePassword(username:string,newPassword:string):Promise<boolean>{
+    try{
+        const updatedUser=await prisma.user_model.update({
+            where:{username},
+            data:{
+             password:newPassword
+            }
+        })
+        console.log(updatedUser)
+        return true 
+    }catch(err){
+        return false
     }
 }
