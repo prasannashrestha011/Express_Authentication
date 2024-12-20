@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { validateJwt } from "../utils/hashing/jwt/jwt";
 
 export async function authMiddleware(req:Request,res:Response,next:NextFunction){
     const jwtToken=req.cookies.jwt;
@@ -8,7 +9,11 @@ export async function authMiddleware(req:Request,res:Response,next:NextFunction)
         res.status(401).json({"err":"request unauthorized, please signIn "})
         return 
     }
-    console.log(jwtToken)
+    const {username,roles}=await validateJwt(jwtToken)
+    if(!username || !roles){
+      res.status(401).json({"err":"session expired"})
+      return 
+    }
     next()
   }catch(err){
     console.log(err)

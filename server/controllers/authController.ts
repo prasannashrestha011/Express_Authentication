@@ -40,7 +40,7 @@ export async function authenticateUser(req:Request<{},{},{username:string,passwo
             res.status(404).json({"err":"user not found!!!"})
             return 
         }
-        const isVerified=await comparePassword(foundUser.password,password)
+        const isVerified=await comparePassword(foundUser.password,password) //stored & plain pass
         if(!isVerified){
             res.status(401).json({"err":"incorrect password"})
             return 

@@ -4,6 +4,7 @@ import contentRoute from './routes/contentRoute'
 import dotenv from 'dotenv'
 import { errorHandlers } from "./middleware/errorHandlers";
 import cookieParser from 'cookie-parser'
+import { authMiddleware } from "./middleware/authMiddleware";
 dotenv.config()
 const app=express()
 const PORT=process.env.PORT
@@ -15,7 +16,7 @@ app.use(cookieParser())
 
 //app routes
 app.use("/api/auth",authRoute)
-app.use(contentRoute)
+app.use(authMiddleware,contentRoute)
 
 
 app.listen(PORT,()=>{
